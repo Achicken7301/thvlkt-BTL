@@ -22,7 +22,7 @@ function varargout = BTL2(varargin)
 
 % Edit the above text to modify the response to help BTL2
 
-% Last Modified by GUIDE v2.5 18-Nov-2021 07:01:53
+% Last Modified by GUIDE v2.5 18-Nov-2021 13:31:38
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -96,7 +96,6 @@ function files_open_Callback(hObject, eventdata, handles)
 path = [path_X, file_X];
 assignin('base', 'path', path);
 % >> file = dir(path)
-% 
 % file = 
 % 
 %        name: 'xray.png'
@@ -116,7 +115,8 @@ set(handles.size, 'String', ['Size: ', num2str(size.bytes), ' bytes']);
 I = imread(path);
 assignin('base', 'I', I);
 % Display on axies1
-axes(handles.axes1); imshow(I); title(name);
+axes(handles.axes1); 
+imshow(I); title(name);
 
 % --------------------------------------------------------------------
 function tools_Callback(hObject, eventdata, handles)
@@ -141,5 +141,12 @@ function axes1_DeleteFcn(hObject, eventdata, handles)
 % --- Executes during object deletion, before destroying properties.
 function axes1_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to axes1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function help_Callback(hObject, eventdata, handles)
+% hObject    handle to help (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)

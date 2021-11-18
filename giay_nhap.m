@@ -1,3 +1,4 @@
+
 % CHECK IF RGB
 % https://www.mathworks.com/matlabcentral/answers/72412-how-can-i-check-that-my-image-is-rgb
 % Color images have 3 channels (R, G, B), so:
@@ -30,4 +31,10 @@ subplot(row, col, 4); imhist(I); title('Histogram');
 
 
 %%
-    
+[A, B] = a.Position;
+figure, imshow('C:\Users\banhb\OneDrive\Documents\thvlkt\thvlkt-BTL\xray.png');
+h = imdistline(gca);
+api = iptgetapi(h);
+fcn = makeConstrainToRectFcn('imline',...
+                              get(gca,'XLim'),get(gca,'YLim'));
+api.setDragConstraintFcn(fcn);   
