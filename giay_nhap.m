@@ -27,4 +27,7 @@ subplot(row, col, 1); imshow(xray); title('Before');
 subplot(row, col, 2); imhist(xray); title('Histogram');
 subplot(row, col, 3); imshow(I); title('After');
 subplot(row, col, 4); imhist(I); title('Histogram');
+
+
+%%
     
