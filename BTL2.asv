@@ -172,10 +172,7 @@ function help_Callback(hObject, eventdata, handles)
 % hObject    handle to help (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-s = sprintf('Check Github for more info:');
-questdlg(s,...
-    'Help',...
-    'OK','OK');
+
 
 % --------------------------------------------------------------------
 function tools_add_distance_Callback(hObject, eventdata, handles)
@@ -228,15 +225,15 @@ function slider1_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 slider_value = get(hObject,'Value');
-try
+tryc
 im = evalin('base', 'im'); % evalin - get variable's value from workspace
 im = imadjust(im, [slider_value 1 - slider_value] ,[]);
 axes(handles.axes2); imshow(im); title('After imadjust');
 axes(handles.axes4); imhist(im); title('Histogram');
 
 % Save variables on workspace
-% assignin('base', 'low_in', slider_value);
-% assignin('base', 'high_in', 1 - slider_value);
+assignin('base', 'low_in', slider_value);
+assignin('base', 'high_in', 1 - slider_value);
 catch
     s = sprintf('Image not found! Please add an image\nFile-Open or Ctrl + O');
     questdlg(s,...
