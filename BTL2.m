@@ -22,7 +22,7 @@ function varargout = BTL2(varargin)
 
 % Edit the above text to modify the response to help BTL2
 
-% Last Modified by GUIDE v2.5 21-Nov-2021 16:25:52
+% Last Modified by GUIDE v2.5 21-Nov-2021 23:19:38
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -110,6 +110,9 @@ size_file = num2str(file.bytes);
 [~, name, ext] = fileparts(path);
 
 % Display name, path, size on static text
+set(handles.text1, 'String', ['Name: ',file.name]);
+set(handles.text2, 'String', ['Path: ', path]);
+set(handles.text3, 'String', ['Size: ', size_file, ' Bytes']);
 im = imread(path);
 % Check if RGB image
 if size(im, 3) == 3
@@ -122,10 +125,6 @@ imshow(im); title(name);
 % Display histogram of an image
 axes(handles.axes3); imhist(im); title('histogram');
 
-% Request real dimension of image (NOT WORKING YET)
-% range = inputdlg({'Length (cm)','Width (cm)'},...
-%               'Real images dimension', [1 50; 1 50]);
-
 % Save variables on workspace
 assignin('base', 'size_file', size_file);
 assignin('base', 'name', file.name);
@@ -133,8 +132,7 @@ assignin('base', 'folder', folder);
 assignin('base', 'name', name);
 assignin('base', 'ext', ext);
 assignin('base', 'im', im);
-% assignin('base', 'range', range); %Feature: add real dimension (not
-% working right now)
+
 
 
 
@@ -230,8 +228,13 @@ function slider1_Callback(hObject, eventdata, handles)
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 slider_value = get(hObject,'Value');
 try
-im = evalin('base', 'im'); % evalin - get variable's value from workspace
-im_adjust = imadjust(im, [slider_value 1 - slider_value] ,[]);
+    try
+        im = evalin('base', 'im_adjust'); % evalin - get variable's value from workspace
+        im_adjust = imadjust(im, [slider_value 1 - slider_value] ,[]);
+    catch
+        im = evalin('base', 'im'); % evalin - get variable's value from workspace
+        im_adjust = imadjust(im, [slider_value 1 - slider_value] ,[]);
+    end
 axes(handles.axes2); imshow(im_adjust); title('After imadjust');
 axes(handles.axes4); imhist(im_adjust); title('Histogram');
 
@@ -239,10 +242,12 @@ axes(handles.axes4); imhist(im_adjust); title('Histogram');
 assignin('base', 'im_adjust', im_adjust);
 % assignin('base', 'high_in', 1 - slider_value);
 catch
-    s = sprintf('Image not found! Please add an image\nFile-Open or Ctrl + O');
+    s = sprintf('Image not found! Please add an image\nFile > Open or Ctrl + O');
     questdlg(s,...
             'Error',...
             'OK','OK');
+%     display('Image not found! Please add an image\nFile > Open or Ctrl + O');
+    return
 end
 
 
@@ -296,4 +301,61 @@ function files_save_as_Callback(hObject, eventdata, handles)
 
 % Save to the specific folder which can rename file.
 
+% --- Executes on button press in btn_dark.
+function btn_dark_Callback(hObject, eventdata, handles)
+% hObject    handle to btn_dark (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
 
+btn_value = get(hObject, 'Value');
+try
+
+    im = evalin('base', 'im_adjust'); % evalin - get variable's value from workspace
+    im_darkness = imsubtract(im, btn_value);
+    axes(handles.axes2); imshow(im_darkness); title('After imadjust');
+    axes(handles.axes4); imhist(im_darkness); title('Histogram');
+    % Save variables on workspace
+    assignin('base', 'im_adjust', im_darkness);
+    % assignin('base', 'high_in', 1 - slider_value);
+catch
+    s = sprintf('Image not found! Please add an image\nFile > Open or Ctrl + O');
+    questdlg(s,...
+            'Error',...
+            'OK','OK');
+end
+
+% --- Executes on button press in btn_light.
+function btn_light_Callback(hObject, eventdata, handles)
+% hObject    handle to btn_light (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+btn_value = get(hObject, 'Value');
+try
+    im = evalin('base', 'im_adjust'); % evalin - get variable's value from workspace
+    im_brighness = imadd(im, btn_value);
+    axes(handles.axes2); imshow(im_brighness); title('After imadjust');
+    axes(handles.axes4); imhist(im_brighness); title('Histogram');
+
+    % Save variables on workspace
+    assignin('base', 'im_adjust', im_brighness);
+    % assignin('base', 'high_in', 1 - slider_value);
+catch
+    s = sprintf('Image not found! Please add an image\nFile > Open or Ctrl + O');
+    questdlg(s,...
+            'Error',...
+            'OK','OK');
+end
+
+
+% --- Executes on button press in pushbutton3.
+function pushbutton3_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+im = evalin('base', 'im');
+assignin('base', 'im_adjust', im);
+name = evalin('base', 'name');
+axes(handles.axes2); 
+imshow(im); title(name);
+axes(handles.axes4); 
+imhist(im); title('Histogram');

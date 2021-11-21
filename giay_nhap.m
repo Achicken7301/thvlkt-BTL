@@ -131,15 +131,11 @@ questdlg(s,...
 catch
     display('fail!');
 end
-%% Save image
-% Get the name of the file that the user wants to save.
-% Note, if you're saving an image you can use imsave() instead of uiputfile().
-% startingFolder = 'C:\Users\banhb\OneDrive\Documents\thvlkt\thvlkt-BTL2\';
-% defaultFileName = fullfile(startingFolder, '*.*');
-% [baseFileName, folder] = uiputfile(defaultFileName, 'Specify a file');
-% if baseFileName == 0
-%   % User clicked the Cancel button.
-%   return;
-% end
-fullFileName = ['xray_example', '-', date, '.png'];
-imwrite(im_adjust, fullFileName);
+%% Image brightness
+% [file_X, folder] = uigetfile('*.dcm; *.png; *.jpg');
+% path = [folder, file_X];
+% xray = imread(path);
+
+brightness = imadd(xray, -53.63636);
+figure(1); imshow(brightness);
+
