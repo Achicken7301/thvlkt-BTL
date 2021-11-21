@@ -7,27 +7,28 @@
 % size(your_Image, 3) = 1
 
 % Get a picture
-path = 'C:\Users\banhb\OneDrive\Documents\thvlkt\BTL\xray.png';
+[file_X, folder] = uigetfile('*.dcm; *.png; *.jpg');
+path = [folder, file_X];
 xray = imread(path);
-xray = rgb2gray(xray);
+% xray = rgb2gray(xray);
 
 % Rotate a picture
-rotate = imrotate(xray, 45);
+% rotate = imrotate(xray, 45);
 
 % imhist - get histogram of an image
-% imhist(xray);   %display histogram
+imshow(xray);   %display histogram
 
 % imaadjust
-I = imadjust(xray, [0.1 0.7] ,[]);
+% I = imadjust(xray, [0.1 0.7] ,[]);
 
 % Display figure
-row = 2;
-end_col = 2;
-figure(1);
-subplot(row, end_col, 1); imshow(xray); title('Before');
-subplot(row, end_col, 2); imhist(xray); title('Histogram');
-subplot(row, end_col, 3); imshow(I); title('After');
-subplot(row, end_col, 4); imhist(I); title('Histogram');
+% row = 2;
+% end_col = 2;
+% figure(1);
+% subplot(row, end_col, 1); imshow(xray); title('Before');
+% subplot(row, end_col, 2); imhist(xray); title('Histogram');
+% subplot(row, end_col, 3); imshow(I); title('After');
+% subplot(row, end_col, 4); imhist(I); title('Histogram');
 
 
 %%
@@ -47,7 +48,7 @@ api.setDragConstraintFcn(fcn);
 %% VI DU TU PIXEL SANG M
 start_row = 1478;
 end_row = 2246;
-meters_per_pixel = 0.001;
+meters_per_pixel = 1;
 rows = [start_row meters_per_pixel end_row];
 start_col = 349;
 end_col = 1117;
@@ -86,12 +87,12 @@ api = iptgetapi(hline);
 api.setLabelTextFormatter('%02.0f meters');  
 
 %% TEST PIXEL SANG CM
-real_length = 60;
-real_width = 50;
+real_length = 30;
+real_width = 25;
 end_row = 1024;
 end_col = 686;
 dien_tich_pixel = (real_length/end_row)*(real_width/end_col);
-cm_per_pixel = 1;
+cm_per_pixel = 37*dien_tich_pixel;
 rows = [1 cm_per_pixel end_row];
 cols = [1 cm_per_pixel end_col];
 path = 'C:\Users\banhb\OneDrive\Documents\thvlkt\thvlkt-BTL2\xray.png';
@@ -130,6 +131,15 @@ questdlg(s,...
 catch
     display('fail!');
 end
-
-    
-
+%% Save image
+% Get the name of the file that the user wants to save.
+% Note, if you're saving an image you can use imsave() instead of uiputfile().
+% startingFolder = 'C:\Users\banhb\OneDrive\Documents\thvlkt\thvlkt-BTL2\';
+% defaultFileName = fullfile(startingFolder, '*.*');
+% [baseFileName, folder] = uiputfile(defaultFileName, 'Specify a file');
+% if baseFileName == 0
+%   % User clicked the Cancel button.
+%   return;
+% end
+fullFileName = ['xray_example', '-', date, '.png'];
+imwrite(im_adjust, fullFileName);

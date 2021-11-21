@@ -22,7 +22,7 @@ function varargout = BTL2(varargin)
 
 % Edit the above text to modify the response to help BTL2
 
-% Last Modified by GUIDE v2.5 20-Nov-2021 10:03:09
+% Last Modified by GUIDE v2.5 21-Nov-2021 16:25:52
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -92,8 +92,12 @@ function files_open_Callback(hObject, eventdata, handles)
 % hObject    handle to files_open (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-[file_X, path_X] = uigetfile('*.dcm; *.png; *.jpg');
-path = [path_X, file_X];
+[file_X, folder] = uigetfile('*.dcm; *.png; *.jpg');
+if file_X == 0
+  % User clicked the Cancel button.
+  return;
+end
+path = [folder, file_X];
 % >> file = dir(path)
 % file = 
 %        name: 'xray.png'
@@ -101,15 +105,16 @@ path = [path_X, file_X];
 %       bytes: 625505
 %       isdir: 0
 %     datenum: 7.3848e+05
-size_file = dir(path);
-size_file = num2str(size_file.bytes);
-[pathstr, name,ext] = fileparts(path);
+file = dir(path);
+size_file = num2str(file.bytes);
+[~, name, ext] = fileparts(path);
 
 % Display name, path, size on static text
 im = imread(path);
-im = rgb2gray(im);
-[row, col] = size(im);
-
+% Check if RGB image
+if size(im, 3) == 3
+    im = rgb2gray(im);
+end
 % Display image on axies1
 axes(handles.axes1); 
 imshow(im); title(name);
@@ -123,13 +128,14 @@ axes(handles.axes3); imhist(im); title('histogram');
 
 % Save variables on workspace
 assignin('base', 'size_file', size_file);
-assignin('base', 'name', [name, ext]);
-assignin('base', 'path', path);
-assignin('base', 'col', col);
-assignin('base', 'row', row);
+assignin('base', 'name', file.name);
+assignin('base', 'folder', folder);
+assignin('base', 'name', name);
+assignin('base', 'ext', ext);
 assignin('base', 'im', im);
 % assignin('base', 'range', range); %Feature: add real dimension (not
 % working right now)
+
 
 
 % --------------------------------------------------------------------
@@ -172,7 +178,7 @@ function help_Callback(hObject, eventdata, handles)
 % hObject    handle to help (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-s = sprintf('Check Github for more info:');
+s = sprintf('Check Github for more info: https://github.com/Achicken7301/thvlkt-BTL');
 questdlg(s,...
     'Help',...
     'OK','OK');
@@ -187,7 +193,7 @@ api = iptgetapi(h);
 fcn = makeConstrainToRectFcn('imline',...
                               get(gca,'XLim'),get(gca,'YLim'));
 api.setDragConstraintFcn(fcn);
-
+api.setLabelTextFormatter('%02.0f cm');
 
 % --------------------------------------------------------------------
 function about_Callback(hObject, eventdata, handles)
@@ -200,11 +206,9 @@ try
 % evalin - get variable's value from workspace
 size_file = evalin('base', 'size_file');
 path = evalin('base', 'path');
-row = evalin('base', 'row');
-col = evalin('base', 'col');
 % sprintf - display a textbox
 % Example: ('%3$s %2$s %1$s %2$s','A','B','C') prints input arguments 'A', 'B', 'C' as follows: C B A B.
-s = sprintf('Image Infomation:\nSize: %1$s Bytes\nPath: %2$s\nRow: %3$i\nCol: %4$i', size_file, path, row, col);
+s = sprintf('Image Infomation:\nSize: %1$s Bytes\nPath: %2$s', size_file, path);
 questdlg(s,...
     'Image Infomation',...
     'OK','OK');
@@ -214,10 +218,6 @@ questdlg(s,...
     'Error',...
     'OK','OK');
 end
-
-
-
-
 
 % --- Executes on slider movement.
 function slider1_Callback(hObject, eventdata, handles)
@@ -230,12 +230,12 @@ function slider1_Callback(hObject, eventdata, handles)
 slider_value = get(hObject,'Value');
 try
 im = evalin('base', 'im'); % evalin - get variable's value from workspace
-im = imadjust(im, [slider_value 1 - slider_value] ,[]);
-axes(handles.axes2); imshow(im); title('After imadjust');
-axes(handles.axes4); imhist(im); title('Histogram');
+im_adjust = imadjust(im, [slider_value 1 - slider_value] ,[]);
+axes(handles.axes2); imshow(im_adjust); title('After imadjust');
+axes(handles.axes4); imhist(im_adjust); title('Histogram');
 
 % Save variables on workspace
-% assignin('base', 'low_in', slider_value);
+assignin('base', 'im_adjust', im_adjust);
 % assignin('base', 'high_in', 1 - slider_value);
 catch
     s = sprintf('Image not found! Please add an image\nFile-Open or Ctrl + O');
@@ -243,6 +243,8 @@ catch
             'Error',...
             'OK','OK');
 end
+
+
 
 
 % --- Executes during object creation, after setting all properties.
@@ -255,3 +257,42 @@ function slider1_CreateFcn(hObject, eventdata, handles)
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
+
+
+% --------------------------------------------------------------------
+function files_save_Callback(hObject, eventdata, handles)
+% hObject    handle to files_save (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Save to the current folder with default name as: date - file_name.*
+try
+    im_adjust = evalin('base', 'im_adjust');
+    name = evalin('base', 'name');
+    ext = evalin('base', 'ext');
+    folder = evalin('base', 'folder');
+    
+    fullFileName = [name, ' ', date, ext];      % Set defailt name
+    imwrite(im_adjust, fullFileName);           % Save iamge
+    s = sprintf('Your image in the folder: %1$s', folder);
+    questdlg(s,...
+        'Save Image Successfully',...
+        'OK','OK');
+catch
+    s = sprintf('Image not found!');
+    questdlg(s,...
+        'Error',...
+        'OK','OK');
+end
+
+
+
+% --------------------------------------------------------------------
+function files_save_as_Callback(hObject, eventdata, handles)
+% hObject    handle to files_save_as (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Save to the specific folder which can rename file.
+
+
