@@ -205,10 +205,10 @@ function about_Callback(hObject, eventdata, handles)
 try
 % evalin - get variable's value from workspace
 size_file = evalin('base', 'size_file');
-path = evalin('base', 'path');
+folder = evalin('base', 'folder');
 % sprintf - display a textbox
 % Example: ('%3$s %2$s %1$s %2$s','A','B','C') prints input arguments 'A', 'B', 'C' as follows: C B A B.
-s = sprintf('Image Infomation:\nSize: %1$s Bytes\nPath: %2$s', size_file, path);
+s = sprintf('Image Infomation:\nSize: %1$s Bytes\nPath: %2$s', size_file, folder);
 questdlg(s,...
     'Image Infomation',...
     'OK','OK');
@@ -218,6 +218,7 @@ questdlg(s,...
     'Error',...
     'OK','OK');
 end
+
 
 % --- Executes on slider movement.
 function slider1_Callback(hObject, eventdata, handles)
