@@ -118,6 +118,8 @@ im = imread(path);
 if size(im, 3) == 3
     im = rgb2gray(im);
 end
+% Get row col im
+[col, row] = size(im);
 % Display image on axies1
 axes(handles.axes1); 
 imshow(im); title(name);
@@ -132,6 +134,8 @@ assignin('base', 'folder', folder);
 assignin('base', 'name', name);
 assignin('base', 'ext', ext);
 assignin('base', 'im', im);
+assignin('base', 'col', col);
+assignin('base', 'row', row);
 
 
 
@@ -183,12 +187,38 @@ function tools_add_distance_Callback(hObject, eventdata, handles)
 % hObject    handle to tools_add_distance (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-h = imdistline(gca);
+
+% Get distance 
+end_row = evalin('base', 'row');
+end_col = evalin('base', 'col');
+% end_row = 1024;
+% end_col = 686;
+
+distanceInPixels = 1024;
+distanceInUnits = 30;
+
+% Distance ratio
+distancePerPixel = distanceInUnits / distanceInPixels;
+rows = [1 distancePerPixel end_row];
+cols = [1 distancePerPixel end_col];
+
+% access the 'children' of the axes for get the x and y data from each call to plot 
+hChildren = get(handles.axes1,'Children');
+
+% Convert XData and YData to meters using conversion factor.
+XDataInMeters = get(hChildren,'XData')*distancePerPixel; 
+YDataInMeters = get(hChildren,'YData')*distancePerPixel;
+     
+% Set XData and YData of image to reflect desired units.    
+set(hChildren,'XData',XDataInMeters,'YData',YDataInMeters);  
+set(handles.axes1,'XLim',XDataInMeters,'YLim',YDataInMeters);
+
+h = imdistline(handles.axes1);
 api = iptgetapi(h);
 fcn = makeConstrainToRectFcn('imline',...
-                              get(gca,'XLim'),get(gca,'YLim'));
+                              get(handles.axes1,'XLim'),get(handles.axes1,'YLim'));
 api.setDragConstraintFcn(fcn);
-api.setLabelTextFormatter('%02.0f cm');
+api.setLabelTextFormatter('%02.2f cm');
 
 % --------------------------------------------------------------------
 function help_about_Callback(hObject, eventdata, handles)
