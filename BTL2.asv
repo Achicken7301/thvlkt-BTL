@@ -363,7 +363,3 @@ function help_doc_Callback(hObject, eventdata, handles)
 % hObject    handle to help_doc (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-s = sprintf('Check Github for more info: https://github.com/Achicken7301/thvlkt-BTL');
-questdlg(s,...
-    'Help',...
-    'OK','OK');
