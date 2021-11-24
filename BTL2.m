@@ -216,7 +216,7 @@ distanceInUnits = 30;
 distancePerPixel = distanceInUnits / distanceInPixels;
 
 % access the 'children' of the axes for get the x and y data from each call to plot 
-hChildren = get(handles.axes1,'Children');
+hChildren = get(gca,'Children');
 
 % Convert XData and YData to meters using conversion factor.
 XDataInMeters = get(hChildren,'XData')*distancePerPixel; 
@@ -224,19 +224,20 @@ YDataInMeters = get(hChildren,'YData')*distancePerPixel;
      
 % Set XData and YData of image to reflect desired units.    
 set(hChildren,'XData',XDataInMeters,'YData',YDataInMeters);  
-set(handles.axes1,'XLim',XDataInMeters,'YLim',YDataInMeters);
+set(gca,'XLim',XDataInMeters,'YLim',YDataInMeters);
 
-h = imdistline(handles.axes1);
+h = imdistline(gca);
 api = iptgetapi(h);
 fcn = makeConstrainToRectFcn('imline',...
-                              get(handles.axes1,'XLim'),get(handles.axes1,'YLim'));
+                              get(gca,'XLim'),get(gca,'YLim'));
 api.setDragConstraintFcn(fcn);
 api.setLabelTextFormatter('%02.2f cm');
-catch
-    s = sprintf('Image not found! Please add an image\nFile > Open or Ctrl + O');
-    questdlg(s,...
-            'Error',...
-            'OK','OK');
+catch ME
+%     s = sprintf('Image not found! Please add an image\nFile > Open or Ctrl + O');
+%     questdlg(s,...
+%             'Error',...
+%             'OK','OK');
+    rethrow(ME);
 end
 
 % --------------------------------------------------------------------
