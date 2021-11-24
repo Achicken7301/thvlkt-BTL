@@ -22,7 +22,7 @@ function varargout = BTL2(varargin)
 
 % Edit the above text to modify the response to help BTL2
 
-% Last Modified by GUIDE v2.5 24-Nov-2021 18:05:06
+% Last Modified by GUIDE v2.5 24-Nov-2021 20:38:34
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -409,14 +409,15 @@ imhist(im); title('Histogram');
 
 
 % --------------------------------------------------------------------
-function help_doc_Callback(hObject, eventdata, handles)
-% hObject    handle to help_doc (see GCBO)
+function help_docs_Callback(hObject, eventdata, handles)
+% hObject    handle to help_docs (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-s = sprintf('Check Github for more info: https://github.com/Achicken7301/thvlkt-BTL');
-questdlg(s,...
-    'Help',...
-    'OK','OK');
+url = 'https://github.com/Achicken7301/thvlkt-BTL/blob/main/docs/Docs.md';
+web(url)
+
+
+
 
 
 % --- Executes on selection change in listfile.
