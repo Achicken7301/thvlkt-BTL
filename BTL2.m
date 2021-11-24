@@ -22,7 +22,7 @@ function varargout = BTL2(varargin)
 
 % Edit the above text to modify the response to help BTL2
 
-% Last Modified by GUIDE v2.5 24-Nov-2021 17:47:20
+% Last Modified by GUIDE v2.5 24-Nov-2021 18:05:06
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -92,12 +92,21 @@ function files_open_Callback(hObject, eventdata, handles)
 % hObject    handle to files_open (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-[file_X, folder] = uigetfile('*.dcm; *.png; *.jpg');
-if file_X == 0
-  % User clicked the Cancel button.
-  return;
+
+cla;
+clc;
+global file_X folder 
+try
+[file_X, folder] = uigetfile({'*.dcm; *.png; *.jpg'}, 'MultiSelect', 'on');
+% add list file to list box
+set(handles.listfile, 'string', file_X); 
+% check cell or array
+if iscell(file_X) == 1
+    namefile = file_X{1};
+else
+    namefile = file_X;
 end
-path = [folder, file_X];
+path = [folder, namefile];
 % >> file = dir(path)
 % file = 
 %        name: 'xray.png'
@@ -125,9 +134,10 @@ axes(handles.axes1);
 imshow(im); title(name);
 
 % Display histogram of an image
-axes(handles.axes3); imhist(im); title('histogram');
+axes(handles.axes3); imhist(im); title('Histogram');
 
 % Save variables on workspace
+assignin('base', 'file_X', file_X);
 assignin('base', 'size_file', size_file);
 assignin('base', 'name', file.name);
 assignin('base', 'folder', folder);
@@ -136,7 +146,12 @@ assignin('base', 'ext', ext);
 assignin('base', 'im', im);
 assignin('base', 'col', col);
 assignin('base', 'row', row);
-
+catch
+    s = sprintf('Image not found! Please add an image .dcm, .png, .jpg');
+questdlg(s,...
+    'Error',...
+    'OK','OK');
+end
 
 
 
@@ -187,20 +202,18 @@ function tools_add_distance_Callback(hObject, eventdata, handles)
 % hObject    handle to tools_add_distance (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+try
 % Get distance 
 end_row = evalin('base', 'row');
 end_col = evalin('base', 'col');
 % end_row = 1024;
 % end_col = 686;
-
+% Value defalut
 distanceInPixels = 1024;
 distanceInUnits = 30;
 
 % Distance ratio
 distancePerPixel = distanceInUnits / distanceInPixels;
-rows = [1 distancePerPixel end_row];
-cols = [1 distancePerPixel end_col];
 
 % access the 'children' of the axes for get the x and y data from each call to plot 
 hChildren = get(handles.axes1,'Children');
@@ -219,6 +232,12 @@ fcn = makeConstrainToRectFcn('imline',...
                               get(handles.axes1,'XLim'),get(handles.axes1,'YLim'));
 api.setDragConstraintFcn(fcn);
 api.setLabelTextFormatter('%02.2f cm');
+catch
+    s = sprintf('Image not found! Please add an image\nFile > Open or Ctrl + O');
+    questdlg(s,...
+            'Error',...
+            'OK','OK');
+end
 
 % --------------------------------------------------------------------
 function help_about_Callback(hObject, eventdata, handles)
@@ -399,19 +418,72 @@ questdlg(s,...
     'OK','OK');
 
 
-% --- Executes on selection change in listbox2.
-function listbox2_Callback(hObject, eventdata, handles)
-% hObject    handle to listbox2 (see GCBO)
+% --- Executes on selection change in listfile.
+function listfile_Callback(hObject, eventdata, handles)
+% hObject    handle to listfile (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = cellstr(get(hObject,'String')) returns listbox2 contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from listbox2
+% Hints: contents = cellstr(get(hObject,'String')) returns listfile contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from listfile
+global file_X folder;
+try
+index = get(hObject, 'Value'); % Get value 
+
+% check cell or array
+if iscell(file_X) == 1
+    namefile = file_X{index};
+else
+    namefile = file_X;
+end
+
+path = [folder, namefile];
+% >> file = dir(path)
+% file = 
+%        name: 'xray.png'
+%        date: '17-Nov-2021 15:51:19'
+%       bytes: 625505
+%       isdir: 0
+%     datenum: 7.3848e+05
+file = dir(path);
+size_file = num2str(file.bytes);
+[~, name, ext] = fileparts(path);
+
+% Display name, path, size on static text
+set(handles.text1, 'String', ['Name: ', file.name]);
+set(handles.text2, 'String', ['Path: ', path]);
+set(handles.text3, 'String', ['Size: ', size_file, ' Bytes']);
+im = imread(path);
+
+% Check if RGB image
+if size(im, 3) == 3
+    im = rgb2gray(im);
+end
+% Display image on axies1
+axes(handles.axes1); 
+imshow(im); title(name);
+
+% Display histogram of an image
+axes(handles.axes3); imhist(im); title('histogram');
+
+% Save variables on workspace
+assignin('base', 'size_file', size_file);
+assignin('base', 'name', file.name);
+assignin('base', 'folder', folder);
+assignin('base', 'name', name);
+assignin('base', 'ext', ext);
+assignin('base', 'im', im);
+catch
+    s = sprintf('Image not found! Please add an image .dcm, .png, .jpg');
+questdlg(s,...
+    'Error',...
+    'OK','OK');
+end
 
 
 % --- Executes during object creation, after setting all properties.
-function listbox2_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to listbox2 (see GCBO)
+function listfile_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to listfile (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
