@@ -3,6 +3,7 @@
 ## Open images
 
 File > Open
+
 ![open images](/docs/images/files_open.png)
 
 ## Adjust images, add bright/dark
