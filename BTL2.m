@@ -22,7 +22,7 @@ function varargout = BTL2(varargin)
 
 % Edit the above text to modify the response to help BTL2
 
-% Last Modified by GUIDE v2.5 24-Nov-2021 20:38:34
+% Last Modified by GUIDE v2.5 25-Nov-2021 22:47:22
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -219,7 +219,7 @@ distanceInUnits = 30;
 distancePerPixel = distanceInUnits / distanceInPixels;
 
 % access the 'children' of the axes for get the x and y data from each call to plot 
-hChildren = get(gca,'Children')
+hChildren = get(gca,'Children');
 
 % Convert XData and YData to meters using conversion factor.
 XDataInMeters = get(hChildren,'XData')*distancePerPixel; 
@@ -496,6 +496,86 @@ function listfile_CreateFcn(hObject, eventdata, handles)
 % handles    empty - handles not created until after all CreateFcns called
 
 % Hint: listbox controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in save_button.
+function save_button_Callback(hObject, eventdata, handles)
+% hObject    handle to save_button (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in adaptivebutton.
+function adaptivebutton_Callback(hObject, eventdata, handles)
+% hObject    handle to adaptivebutton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of adaptivebutton
+
+
+% --- Executes on button press in averangebutton.
+function averangebutton_Callback(hObject, eventdata, handles)
+% hObject    handle to averangebutton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of averangebutton
+
+
+% --- Executes on button press in medianbutton.
+function medianbutton_Callback(hObject, eventdata, handles)
+% hObject    handle to medianbutton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of medianbutton
+
+
+
+function width_value_Callback(hObject, eventdata, handles)
+% hObject    handle to width_value (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of width_value as text
+%        str2double(get(hObject,'String')) returns contents of width_value as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function width_value_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to width_value (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function height_value_Callback(hObject, eventdata, handles)
+% hObject    handle to height_value (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of height_value as text
+%        str2double(get(hObject,'String')) returns contents of height_value as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function height_value_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to height_value (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
