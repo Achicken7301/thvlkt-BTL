@@ -507,7 +507,23 @@ function save_button_Callback(hObject, eventdata, handles)
 % hObject    handle to save_button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+selection=get(get(handles.Filter,'SelectedObject'), 'String');
+%Add path Auto_filter to get function in path
+addpath(genpath('Auto_filter'));
+[filename,pathname]=uigetfile({'*'},'MultiSelect','on');
+if (iscell(filename))
+%%Get all file name from user choice
+    for i=1:length(filename)
+        name=filename{i};
+        path=[pathname,name];        
+        image_filter(path,selection)
+    end
+else
+    name=filename;
+    name=filename;
+    path=[pathname,name];
+    [K]=image_filter(path,selection);    
+end
 
 % --- Executes on button press in adaptivebutton.
 function adaptivebutton_Callback(hObject, eventdata, handles)
