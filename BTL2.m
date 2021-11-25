@@ -92,8 +92,11 @@ function files_open_Callback(hObject, eventdata, handles)
 % hObject    handle to files_open (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
-cla;
+% clear axes
+cla(handles.axes1,'reset');
+cla(handles.axes2,'reset');
+cla(handles.axes3,'reset');
+cla(handles.axes4,'reset');
 clc;
 global file_X folder 
 try
@@ -216,7 +219,7 @@ distanceInUnits = 30;
 distancePerPixel = distanceInUnits / distanceInPixels;
 
 % access the 'children' of the axes for get the x and y data from each call to plot 
-hChildren = get(gca,'Children');
+hChildren = get(gca,'Children')
 
 % Convert XData and YData to meters using conversion factor.
 XDataInMeters = get(hChildren,'XData')*distancePerPixel; 
@@ -428,6 +431,9 @@ function listfile_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns listfile contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from listfile
+% clear axes
+cla(handles.axes2,'reset');
+cla(handles.axes4,'reset');
 global file_X folder;
 try
 index = get(hObject, 'Value'); % Get value 
