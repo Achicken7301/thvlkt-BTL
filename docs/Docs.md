@@ -20,6 +20,9 @@ Use slider to customize adjust of an image. Dark/Bright buttons to add bright or
 ## Remove Noise in Image
 Choose filter you want in Filter 
 **Click Save button** Choose images you want to remove noise
+
 ![remove_noise](/docs/images/filter_selection.png)
+
 Image Filtered will show on figure and save into current folder
-![remove_noise](/docs/images/image_filtered.png)
+
+![image_remove_noise](/docs/images/image_filtered.png)
