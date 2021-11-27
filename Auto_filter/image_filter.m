@@ -23,8 +23,10 @@ function [K]=image_filter (path,selection)
     figure(1)
     subplot(2,1,1)
     imshow(I);
+    title('Noise Image')
     subplot(2,1,2)
     imshow(K)
-    %%Save image with name+ '_Filted'
-    imwrite(K,[name,'_Filtered.png'])
+    title('Filtered Image')
+    %%Save image with name+ '_Filtred'
+    imwrite(K,[name,'_Filtered',ext]);
 end
