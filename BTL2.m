@@ -205,43 +205,53 @@ function tools_add_distance_Callback(hObject, eventdata, handles)
 % hObject    handle to tools_add_distance (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-try
-% Get distance 
-end_row = evalin('base', 'row');
-end_col = evalin('base', 'col');
-% end_row = 1024;
-% end_col = 686;
-% Value defalut
-distanceInPixels = 1024;
-distanceInUnits = 30;
 
-% Distance ratio
-distancePerPixel = distanceInUnits / distanceInPixels;
-
-% access the 'children' of the axes for get the x and y data from each call to plot 
+% access the 'children' of the axes for get the x and y data from each call to plot
 hChildren = get(gca,'Children');
 
-% Convert XData and YData to meters using conversion factor.
-XDataInMeters = get(hChildren,'XData')*distancePerPixel; 
-YDataInMeters = get(hChildren,'YData')*distancePerPixel;
-     
-% Set XData and YData of image to reflect desired units.    
-set(hChildren,'XData',XDataInMeters,'YData',YDataInMeters);  
-set(gca,'XLim',XDataInMeters,'YLim',YDataInMeters);
-
-h = imdistline(gca);
-api = iptgetapi(h);
-fcn = makeConstrainToRectFcn('imline',...
-                              get(gca,'XLim'),get(gca,'YLim'));
-api.setDragConstraintFcn(fcn);
-api.setLabelTextFormatter('%02.2f cm');
-catch ME
-%     s = sprintf('Image not found! Please add an image\nFile > Open or Ctrl + O');
-%     questdlg(s,...
-%             'Error',...
-%             'OK','OK');
-    rethrow(ME);
+if size(hChildren) == [1; 1]
+    
+    % Get distance
+    end_row = evalin('base', 'row');
+    end_col = evalin('base', 'col');
+    width = str2num(get(handles.width_value,'string'));
+    height = str2num(get(handles.height_value,'string'));
+    
+    if size(width) == 0
+        msgbox('Please enter real size image.', 'Error')
+    else
+        
+        % end_row = 1024;
+        % end_col = 686;
+        % choose width as standard
+        distanceInPixels = end_row;
+        distanceInUnits = width;
+        
+        % Distance ratio
+        distancePerPixel = distanceInUnits / distanceInPixels;
+        
+        % Convert XData and YData to meters using conversion factor.
+        XDataInMeters = get(hChildren,'XData')*distancePerPixel;
+        YDataInMeters = get(hChildren,'YData')*distancePerPixel;
+        
+        % Set XData and YData of image to reflect desired units.
+        set(hChildren,'XData',XDataInMeters,'YData',YDataInMeters);
+        set(gca,'XLim',XDataInMeters,'YLim',YDataInMeters);
+        
+        h = imdistline(gca);
+        api = iptgetapi(h);
+        fcn = makeConstrainToRectFcn('imline',...
+            get(gca,'XLim'),get(gca,'YLim'));
+        api.setDragConstraintFcn(fcn);
+        api.setLabelTextFormatter('%02.2f cm');
+    end
+elseif size(hChildren) == [0; 0]
+    s = sprintf('Image not found! Please add an image\nFile > Open or Ctrl + O');
+    questdlg(s,...
+        'Error',...
+        'OK','OK');
 end
+
 
 % --------------------------------------------------------------------
 function help_about_Callback(hObject, eventdata, handles)
@@ -251,20 +261,20 @@ function help_about_Callback(hObject, eventdata, handles)
 
 % Check if all variables exist?
 try
-% evalin - get variable's value from workspace
-size_file = evalin('base', 'size_file');
-folder = evalin('base', 'folder');
-% sprintf - display a textbox
-% Example: ('%3$s %2$s %1$s %2$s','A','B','C') prints input arguments 'A', 'B', 'C' as follows: C B A B.
-s = sprintf('Image Infomation:\nSize: %1$s Bytes\nPath: %2$s', size_file, folder);
-questdlg(s,...
-    'Image Infomation',...
-    'OK','OK');
+    % evalin - get variable's value from workspace
+    size_file = evalin('base', 'size_file');
+    folder = evalin('base', 'folder');
+    % sprintf - display a textbox
+    % Example: ('%3$s %2$s %1$s %2$s','A','B','C') prints input arguments 'A', 'B', 'C' as follows: C B A B.
+    s = sprintf('Image Infomation:\nSize: %1$s Bytes\nPath: %2$s', size_file, folder);
+    questdlg(s,...
+        'Image Infomation',...
+        'OK','OK');
 catch
     s = sprintf('Image not found! Please add an image\nFile-Open or Ctrl + O');
-questdlg(s,...
-    'Error',...
-    'OK','OK');
+    questdlg(s,...
+        'Error',...
+        'OK','OK');
 end
 
 
@@ -285,18 +295,18 @@ try
         im = evalin('base', 'im'); % evalin - get variable's value from workspace
         im_adjust = imadjust(im, [slider_value 1 - slider_value] ,[]);
     end
-axes(handles.axes2); imshow(im_adjust); title('After imadjust');
-axes(handles.axes4); imhist(im_adjust); title('Histogram');
-
-% Save variables on workspace
-assignin('base', 'im_adjust', im_adjust);
-% assignin('base', 'high_in', 1 - slider_value);
+    axes(handles.axes2); imshow(im_adjust); title('After imadjust');
+    axes(handles.axes4); imhist(im_adjust); title('Histogram');
+    
+    % Save variables on workspace
+    assignin('base', 'im_adjust', im_adjust);
+    % assignin('base', 'high_in', 1 - slider_value);
 catch
     s = sprintf('Image not found! Please add an image\nFile > Open or Ctrl + O');
     questdlg(s,...
-            'Error',...
-            'OK','OK');
-%     display('Image not found! Please add an image\nFile > Open or Ctrl + O');
+        'Error',...
+        'OK','OK');
+    %     display('Image not found! Please add an image\nFile > Open or Ctrl + O');
     return
 end
 
@@ -359,8 +369,11 @@ function btn_dark_Callback(hObject, eventdata, handles)
 
 btn_value = get(hObject, 'Value');
 try
-
-    im = evalin('base', 'im_adjust'); % evalin - get variable's value from workspace
+    try
+        im = evalin('base', 'im_adjust'); % evalin - get variable's value from workspace
+    catch
+        im = evalin('base', 'im'); % evalin - get variable's value from workspace
+    end
     im_darkness = imsubtract(im, btn_value);
     axes(handles.axes2); imshow(im_darkness); title('After imadjust');
     axes(handles.axes4); imhist(im_darkness); title('Histogram');
@@ -370,8 +383,8 @@ try
 catch
     s = sprintf('Image not found! Please add an image\nFile > Open or Ctrl + O');
     questdlg(s,...
-            'Error',...
-            'OK','OK');
+        'Error',...
+        'OK','OK');
 end
 
 % --- Executes on button press in btn_light.
@@ -381,19 +394,23 @@ function btn_light_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 btn_value = get(hObject, 'Value');
 try
-    im = evalin('base', 'im_adjust'); % evalin - get variable's value from workspace
+    try
+        im = evalin('base', 'im_adjust'); % evalin - get variable's value from workspace
+    catch
+        im = evalin('base', 'im'); % evalin - get variable's value from workspace
+    end
     im_brighness = imadd(im, btn_value);
     axes(handles.axes2); imshow(im_brighness); title('After imadjust');
     axes(handles.axes4); imhist(im_brighness); title('Histogram');
-
+    
     % Save variables on workspace
     assignin('base', 'im_adjust', im_brighness);
     % assignin('base', 'high_in', 1 - slider_value);
 catch
     s = sprintf('Image not found! Please add an image\nFile > Open or Ctrl + O');
     questdlg(s,...
-            'Error',...
-            'OK','OK');
+        'Error',...
+        'OK','OK');
 end
 
 
@@ -436,56 +453,56 @@ cla(handles.axes2,'reset');
 cla(handles.axes4,'reset');
 global file_X folder;
 try
-index = get(hObject, 'Value'); % Get value 
-
-% check cell or array
-if iscell(file_X) == 1
-    namefile = file_X{index};
-else
-    namefile = file_X;
-end
-
-path = [folder, namefile];
-% >> file = dir(path)
-% file = 
-%        name: 'xray.png'
-%        date: '17-Nov-2021 15:51:19'
-%       bytes: 625505
-%       isdir: 0
-%     datenum: 7.3848e+05
-file = dir(path);
-size_file = num2str(file.bytes);
-[~, name, ext] = fileparts(path);
-
-% Display name, path, size on static text
-set(handles.text1, 'String', ['Name: ', file.name]);
-set(handles.text2, 'String', ['Path: ', path]);
-set(handles.text3, 'String', ['Size: ', size_file, ' Bytes']);
-im = imread(path);
-
-% Check if RGB image
-if size(im, 3) == 3
-    im = rgb2gray(im);
-end
-% Display image on axies1
-axes(handles.axes1); 
-imshow(im); title(name);
-
-% Display histogram of an image
-axes(handles.axes3); imhist(im); title('histogram');
-
-% Save variables on workspace
-assignin('base', 'size_file', size_file);
-assignin('base', 'name', file.name);
-assignin('base', 'folder', folder);
-assignin('base', 'name', name);
-assignin('base', 'ext', ext);
-assignin('base', 'im', im);
+    index = get(hObject, 'Value'); % Get value
+    
+    % check cell or array
+    if iscell(file_X) == 1
+        namefile = file_X{index};
+    else
+        namefile = file_X;
+    end
+    
+    path = [folder, namefile];
+    % >> file = dir(path)
+    % file =
+    %        name: 'xray.png'
+    %        date: '17-Nov-2021 15:51:19'
+    %       bytes: 625505
+    %       isdir: 0
+    %     datenum: 7.3848e+05
+    file = dir(path);
+    size_file = num2str(file.bytes);
+    [~, name, ext] = fileparts(path);
+    
+    % Display name, path, size on static text
+    set(handles.text1, 'String', ['Name: ', file.name]);
+    set(handles.text2, 'String', ['Path: ', path]);
+    set(handles.text3, 'String', ['Size: ', size_file, ' Bytes']);
+    im = imread(path);
+    
+    % Check if RGB image
+    if size(im, 3) == 3
+        im = rgb2gray(im);
+    end
+    % Display image on axies1
+    axes(handles.axes1);
+    imshow(im); title(name);
+    
+    % Display histogram of an image
+    axes(handles.axes3); imhist(im); title('histogram');
+    
+    % Save variables on workspace
+    assignin('base', 'size_file', size_file);
+    assignin('base', 'name', file.name);
+    assignin('base', 'folder', folder);
+    assignin('base', 'name', name);
+    assignin('base', 'ext', ext);
+    assignin('base', 'im', im);
 catch
     s = sprintf('Image not found! Please add an image .dcm, .png, .jpg');
-questdlg(s,...
-    'Error',...
-    'OK','OK');
+    questdlg(s,...
+        'Error',...
+        'OK','OK');
 end
 
 
@@ -527,9 +544,9 @@ try
     end
 catch
     s = sprintf('Image not found! Please add an image .dcm, .png, .jpg');
-questdlg(s,...
-    'Error',...
-    'OK','OK');
+    questdlg(s,...
+        'Error',...
+        'OK','OK');
 end
 
 % --- Executes on button press in adaptivebutton.
@@ -569,6 +586,8 @@ function width_value_Callback(hObject, eventdata, handles)
 %        str2double(get(hObject,'String')) returns contents of width_value as a double
 
 
+
+
 % --- Executes during object creation, after setting all properties.
 function width_value_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to width_value (see GCBO)
@@ -590,6 +609,7 @@ function height_value_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of height_value as text
 %        str2double(get(hObject,'String')) returns contents of height_value as a double
+
 
 
 % --- Executes during object creation, after setting all properties.
