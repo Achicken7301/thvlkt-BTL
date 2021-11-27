@@ -209,11 +209,13 @@ try
 % Get distance 
 end_row = evalin('base', 'row');
 end_col = evalin('base', 'col');
+width = str2num(get(handles.width_value,'string'));
+height = str2num(get(handles.height_value,'string'));
+
 % end_row = 1024;
 % end_col = 686;
-% Value defalut
-distanceInPixels = 1024;
-distanceInUnits = 30;
+distanceInPixels = end_row;
+distanceInUnits = width;
 
 % Distance ratio
 distancePerPixel = distanceInUnits / distanceInPixels;
@@ -546,6 +548,8 @@ function width_value_Callback(hObject, eventdata, handles)
 %        str2double(get(hObject,'String')) returns contents of width_value as a double
 
 
+
+
 % --- Executes during object creation, after setting all properties.
 function width_value_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to width_value (see GCBO)
@@ -567,6 +571,7 @@ function height_value_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of height_value as text
 %        str2double(get(hObject,'String')) returns contents of height_value as a double
+
 
 
 % --- Executes during object creation, after setting all properties.
