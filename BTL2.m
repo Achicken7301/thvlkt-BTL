@@ -205,45 +205,53 @@ function tools_add_distance_Callback(hObject, eventdata, handles)
 % hObject    handle to tools_add_distance (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-try
-% Get distance 
-end_row = evalin('base', 'row');
-end_col = evalin('base', 'col');
-width = str2num(get(handles.width_value,'string'));
-height = str2num(get(handles.height_value,'string'));
 
-% end_row = 1024;
-% end_col = 686;
-distanceInPixels = end_row;
-distanceInUnits = width;
-
-% Distance ratio
-distancePerPixel = distanceInUnits / distanceInPixels;
-
-% access the 'children' of the axes for get the x and y data from each call to plot 
+% access the 'children' of the axes for get the x and y data from each call to plot
 hChildren = get(gca,'Children');
 
-% Convert XData and YData to meters using conversion factor.
-XDataInMeters = get(hChildren,'XData')*distancePerPixel; 
-YDataInMeters = get(hChildren,'YData')*distancePerPixel;
-     
-% Set XData and YData of image to reflect desired units.    
-set(hChildren,'XData',XDataInMeters,'YData',YDataInMeters);  
-set(gca,'XLim',XDataInMeters,'YLim',YDataInMeters);
-
-h = imdistline(gca);
-api = iptgetapi(h);
-fcn = makeConstrainToRectFcn('imline',...
-                              get(gca,'XLim'),get(gca,'YLim'));
-api.setDragConstraintFcn(fcn);
-api.setLabelTextFormatter('%02.2f cm');
-catch ME
-%     s = sprintf('Image not found! Please add an image\nFile > Open or Ctrl + O');
-%     questdlg(s,...
-%             'Error',...
-%             'OK','OK');
-    rethrow(ME);
+if size(hChildren) == [1; 1]
+    
+    % Get distance
+    end_row = evalin('base', 'row');
+    end_col = evalin('base', 'col');
+    width = str2num(get(handles.width_value,'string'));
+    height = str2num(get(handles.height_value,'string'));
+    
+    if size(width) == 0
+        msgbox('Please enter real size image.', 'Error')
+    else
+        
+        % end_row = 1024;
+        % end_col = 686;
+        % choose width as standard
+        distanceInPixels = end_row;
+        distanceInUnits = width;
+        
+        % Distance ratio
+        distancePerPixel = distanceInUnits / distanceInPixels;
+        
+        % Convert XData and YData to meters using conversion factor.
+        XDataInMeters = get(hChildren,'XData')*distancePerPixel;
+        YDataInMeters = get(hChildren,'YData')*distancePerPixel;
+        
+        % Set XData and YData of image to reflect desired units.
+        set(hChildren,'XData',XDataInMeters,'YData',YDataInMeters);
+        set(gca,'XLim',XDataInMeters,'YLim',YDataInMeters);
+        
+        h = imdistline(gca);
+        api = iptgetapi(h);
+        fcn = makeConstrainToRectFcn('imline',...
+            get(gca,'XLim'),get(gca,'YLim'));
+        api.setDragConstraintFcn(fcn);
+        api.setLabelTextFormatter('%02.2f cm');
+    end
+elseif size(hChildren) == [0; 0]
+    s = sprintf('Image not found! Please add an image\nFile > Open or Ctrl + O');
+    questdlg(s,...
+        'Error',...
+        'OK','OK');
 end
+
 
 % --------------------------------------------------------------------
 function help_about_Callback(hObject, eventdata, handles)
@@ -253,20 +261,20 @@ function help_about_Callback(hObject, eventdata, handles)
 
 % Check if all variables exist?
 try
-% evalin - get variable's value from workspace
-size_file = evalin('base', 'size_file');
-folder = evalin('base', 'folder');
-% sprintf - display a textbox
-% Example: ('%3$s %2$s %1$s %2$s','A','B','C') prints input arguments 'A', 'B', 'C' as follows: C B A B.
-s = sprintf('Image Infomation:\nSize: %1$s Bytes\nPath: %2$s', size_file, folder);
-questdlg(s,...
-    'Image Infomation',...
-    'OK','OK');
+    % evalin - get variable's value from workspace
+    size_file = evalin('base', 'size_file');
+    folder = evalin('base', 'folder');
+    % sprintf - display a textbox
+    % Example: ('%3$s %2$s %1$s %2$s','A','B','C') prints input arguments 'A', 'B', 'C' as follows: C B A B.
+    s = sprintf('Image Infomation:\nSize: %1$s Bytes\nPath: %2$s', size_file, folder);
+    questdlg(s,...
+        'Image Infomation',...
+        'OK','OK');
 catch
     s = sprintf('Image not found! Please add an image\nFile-Open or Ctrl + O');
-questdlg(s,...
-    'Error',...
-    'OK','OK');
+    questdlg(s,...
+        'Error',...
+        'OK','OK');
 end
 
 
@@ -287,18 +295,18 @@ try
         im = evalin('base', 'im'); % evalin - get variable's value from workspace
         im_adjust = imadjust(im, [slider_value 1 - slider_value] ,[]);
     end
-axes(handles.axes2); imshow(im_adjust); title('After imadjust');
-axes(handles.axes4); imhist(im_adjust); title('Histogram');
-
-% Save variables on workspace
-assignin('base', 'im_adjust', im_adjust);
-% assignin('base', 'high_in', 1 - slider_value);
+    axes(handles.axes2); imshow(im_adjust); title('After imadjust');
+    axes(handles.axes4); imhist(im_adjust); title('Histogram');
+    
+    % Save variables on workspace
+    assignin('base', 'im_adjust', im_adjust);
+    % assignin('base', 'high_in', 1 - slider_value);
 catch
     s = sprintf('Image not found! Please add an image\nFile > Open or Ctrl + O');
     questdlg(s,...
-            'Error',...
-            'OK','OK');
-%     display('Image not found! Please add an image\nFile > Open or Ctrl + O');
+        'Error',...
+        'OK','OK');
+    %     display('Image not found! Please add an image\nFile > Open or Ctrl + O');
     return
 end
 
