@@ -369,8 +369,11 @@ function btn_dark_Callback(hObject, eventdata, handles)
 
 btn_value = get(hObject, 'Value');
 try
-
-    im = evalin('base', 'im_adjust'); % evalin - get variable's value from workspace
+    try
+        im = evalin('base', 'im_adjust'); % evalin - get variable's value from workspace
+    catch
+        im = evalin('base', 'im'); % evalin - get variable's value from workspace
+    end
     im_darkness = imsubtract(im, btn_value);
     axes(handles.axes2); imshow(im_darkness); title('After imadjust');
     axes(handles.axes4); imhist(im_darkness); title('Histogram');
@@ -380,8 +383,8 @@ try
 catch
     s = sprintf('Image not found! Please add an image\nFile > Open or Ctrl + O');
     questdlg(s,...
-            'Error',...
-            'OK','OK');
+        'Error',...
+        'OK','OK');
 end
 
 % --- Executes on button press in btn_light.
@@ -391,19 +394,23 @@ function btn_light_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 btn_value = get(hObject, 'Value');
 try
-    im = evalin('base', 'im_adjust'); % evalin - get variable's value from workspace
+    try
+        im = evalin('base', 'im_adjust'); % evalin - get variable's value from workspace
+    catch
+        im = evalin('base', 'im'); % evalin - get variable's value from workspace
+    end
     im_brighness = imadd(im, btn_value);
     axes(handles.axes2); imshow(im_brighness); title('After imadjust');
     axes(handles.axes4); imhist(im_brighness); title('Histogram');
-
+    
     % Save variables on workspace
     assignin('base', 'im_adjust', im_brighness);
     % assignin('base', 'high_in', 1 - slider_value);
 catch
     s = sprintf('Image not found! Please add an image\nFile > Open or Ctrl + O');
     questdlg(s,...
-            'Error',...
-            'OK','OK');
+        'Error',...
+        'OK','OK');
 end
 
 
@@ -446,56 +453,56 @@ cla(handles.axes2,'reset');
 cla(handles.axes4,'reset');
 global file_X folder;
 try
-index = get(hObject, 'Value'); % Get value 
-
-% check cell or array
-if iscell(file_X) == 1
-    namefile = file_X{index};
-else
-    namefile = file_X;
-end
-
-path = [folder, namefile];
-% >> file = dir(path)
-% file = 
-%        name: 'xray.png'
-%        date: '17-Nov-2021 15:51:19'
-%       bytes: 625505
-%       isdir: 0
-%     datenum: 7.3848e+05
-file = dir(path);
-size_file = num2str(file.bytes);
-[~, name, ext] = fileparts(path);
-
-% Display name, path, size on static text
-set(handles.text1, 'String', ['Name: ', file.name]);
-set(handles.text2, 'String', ['Path: ', path]);
-set(handles.text3, 'String', ['Size: ', size_file, ' Bytes']);
-im = imread(path);
-
-% Check if RGB image
-if size(im, 3) == 3
-    im = rgb2gray(im);
-end
-% Display image on axies1
-axes(handles.axes1); 
-imshow(im); title(name);
-
-% Display histogram of an image
-axes(handles.axes3); imhist(im); title('histogram');
-
-% Save variables on workspace
-assignin('base', 'size_file', size_file);
-assignin('base', 'name', file.name);
-assignin('base', 'folder', folder);
-assignin('base', 'name', name);
-assignin('base', 'ext', ext);
-assignin('base', 'im', im);
+    index = get(hObject, 'Value'); % Get value
+    
+    % check cell or array
+    if iscell(file_X) == 1
+        namefile = file_X{index};
+    else
+        namefile = file_X;
+    end
+    
+    path = [folder, namefile];
+    % >> file = dir(path)
+    % file =
+    %        name: 'xray.png'
+    %        date: '17-Nov-2021 15:51:19'
+    %       bytes: 625505
+    %       isdir: 0
+    %     datenum: 7.3848e+05
+    file = dir(path);
+    size_file = num2str(file.bytes);
+    [~, name, ext] = fileparts(path);
+    
+    % Display name, path, size on static text
+    set(handles.text1, 'String', ['Name: ', file.name]);
+    set(handles.text2, 'String', ['Path: ', path]);
+    set(handles.text3, 'String', ['Size: ', size_file, ' Bytes']);
+    im = imread(path);
+    
+    % Check if RGB image
+    if size(im, 3) == 3
+        im = rgb2gray(im);
+    end
+    % Display image on axies1
+    axes(handles.axes1);
+    imshow(im); title(name);
+    
+    % Display histogram of an image
+    axes(handles.axes3); imhist(im); title('histogram');
+    
+    % Save variables on workspace
+    assignin('base', 'size_file', size_file);
+    assignin('base', 'name', file.name);
+    assignin('base', 'folder', folder);
+    assignin('base', 'name', name);
+    assignin('base', 'ext', ext);
+    assignin('base', 'im', im);
 catch
     s = sprintf('Image not found! Please add an image .dcm, .png, .jpg');
-questdlg(s,...
-    'Error',...
-    'OK','OK');
+    questdlg(s,...
+        'Error',...
+        'OK','OK');
 end
 
 
@@ -537,9 +544,9 @@ try
     end
 catch
     s = sprintf('Image not found! Please add an image .dcm, .png, .jpg');
-questdlg(s,...
-    'Error',...
-    'OK','OK');
+    questdlg(s,...
+        'Error',...
+        'OK','OK');
 end
 
 % --- Executes on button press in adaptivebutton.
