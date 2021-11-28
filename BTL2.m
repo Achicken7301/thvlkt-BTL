@@ -209,7 +209,7 @@ function tools_add_distance_Callback(hObject, eventdata, handles)
 % access the 'children' of the axes for get the x and y data from each call to plot
 hChildren = get(gca,'Children');
 
-if size(hChildren) == [1; 1]
+if size(hChildren) == [1 1]
     
     % Get distance
     end_row = evalin('base', 'row');
@@ -245,7 +245,7 @@ if size(hChildren) == [1; 1]
         api.setDragConstraintFcn(fcn);
         api.setLabelTextFormatter('%02.2f cm');
     end
-elseif size(hChildren) == [0; 0]
+elseif size(hChildren) == 0
     s = sprintf('Image not found! Please add an image\nFile > Open or Ctrl + O');
     questdlg(s,...
         'Error',...
