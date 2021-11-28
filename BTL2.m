@@ -210,7 +210,7 @@ function tools_add_distance_Callback(hObject, eventdata, handles)
 hChildren = get(gca,'Children');
 
 if size(hChildren) == [1 1]
-    
+    im = evalin('base', 'im');
     % Get distance
     end_row = evalin('base', 'row');
     end_col = evalin('base', 'col');
@@ -233,17 +233,25 @@ if size(hChildren) == [1 1]
         % Convert XData and YData to meters using conversion factor.
         XDataInMeters = get(hChildren,'XData')*distancePerPixel;
         YDataInMeters = get(hChildren,'YData')*distancePerPixel;
-        
-        % Set XData and YData of image to reflect desired units.
-        set(hChildren,'XData',XDataInMeters,'YData',YDataInMeters);
-        set(gca,'XLim',XDataInMeters,'YLim',YDataInMeters);
-        
-        h = imdistline(gca);
-        api = iptgetapi(h);
-        fcn = makeConstrainToRectFcn('imline',...
-            get(gca,'XLim'),get(gca,'YLim'));
-        api.setDragConstraintFcn(fcn);
-        api.setLabelTextFormatter('%02.2f cm');
+        try
+            % Set XData and YData of image to reflect desired units.
+            set(hChildren,'XData',XDataInMeters,'YData',YDataInMeters);
+            set(gca,'XLim',XDataInMeters,'YLim',YDataInMeters);
+            
+            h = imdistline(gca);
+            api = iptgetapi(h);
+            fcn = makeConstrainToRectFcn('imline',...
+                get(gca,'XLim'),get(gca,'YLim'));
+            api.setDragConstraintFcn(fcn);
+            api.setLabelTextFormatter('%02.2f cm');
+        catch
+            % Show histogram again
+            axes(handles.axes3); imhist(im);
+            s = sprintf('Please choose an image!');
+            questdlg(s,...
+                'Error',...
+                'OK','OK');
+        end
     end
 elseif size(hChildren) == 0
     s = sprintf('Image not found! Please add an image\nFile > Open or Ctrl + O');
@@ -484,6 +492,9 @@ try
     if size(im, 3) == 3
         im = rgb2gray(im);
     end
+    
+    % Get row col im
+    [col, row] = size(im);
     % Display image on axies1
     axes(handles.axes1);
     imshow(im); title(name);
@@ -492,12 +503,15 @@ try
     axes(handles.axes3); imhist(im); title('histogram');
     
     % Save variables on workspace
+    assignin('base', 'file_X', namefile);
     assignin('base', 'size_file', size_file);
     assignin('base', 'name', file.name);
     assignin('base', 'folder', folder);
     assignin('base', 'name', name);
     assignin('base', 'ext', ext);
     assignin('base', 'im', im);
+    assignin('base', 'col', col);
+    assignin('base', 'row', row);
 catch
     s = sprintf('Image not found! Please add an image .dcm, .png, .jpg');
     questdlg(s,...
