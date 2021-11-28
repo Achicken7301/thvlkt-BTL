@@ -214,11 +214,11 @@ if size(hChildren) == [1 1]
     % Get distance
     end_row = evalin('base', 'row');
     end_col = evalin('base', 'col');
-    width = str2num(get(handles.width_value,'string'));
-    height = str2num(get(handles.height_value,'string'));
+    width = str2double(get(handles.width_value,'string'));
+    height = str2double(get(handles.height_value,'string'));
     
     if size(width) == 0
-        msgbox('Please enter real size image.', 'Error')
+        msgbox('Please enter real size image.', 'Error');
     else
         
         % end_row = 1024;
