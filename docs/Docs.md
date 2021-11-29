@@ -2,13 +2,13 @@
 
 ## Open images
 
-File > Open
+Files > Open
 
 ![open images](/docs/images/files_open.png)
 
 ## Adjust images, add bright/dark
 
-Use slider to customize adjust of an image. Dark/Bright buttons to add bright or dark.
+Use slider to adjust contrast of an image. Dark/Bright buttons to add dark or bright.
 
 ![adjust](/docs/images/image_adjust.png)
 
